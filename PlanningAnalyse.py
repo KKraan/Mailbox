@@ -14,10 +14,8 @@ import re
 from collections import Counter
 stopword = stopwords.words("dutch")
 
-test=True
-workingdir='C:\\Users\\Kraan\\OneDrive - KZA B.V\\Data-gilde\\KZAplanning\\'
-textfilename=workingdir+'mailtekst.txt'
-sourcefile=workingdir+'Mailgegevens.xlsx'
+sourcefile='Mailgegevens.xlsx'
+textfilename='mailtekst.txt'
 
 #DEFINE FUNCTIONS
 def definenumber(textpart):
@@ -82,30 +80,31 @@ def writetext(filename,inputmatrix):
             f.write(temp+'\n')
     f.close()
 
-#read data
-dfxls=pd.read_excel(sourcefile,encoding='utf-8',errors='ignore')
+def readdata(sourcefile):
+    #read data
+    dfxls=pd.read_excel(sourcefile,encoding='utf-8',errors='ignore')
 
-#create indicator for in or outgoing mail
-dfxls['Inkomend']=(dfxls['afzendernaam']!='KZA Planning') #als de afzender "KZA planning" is komt hier dus "FALSE"
-dfxls['status']=(definenumber(dfxls['Map']))
+    #create indicator for in or outgoing mail
+    dfxls['Inkomend']=(dfxls['afzendernaam']!='KZA Planning') #als de afzender "KZA planning" is komt hier dus "FALSE"
+    dfxls['status']=(definenumber(dfxls['Map']))
 
-#select relevant columns
-dfxls=dfxls[['Inkomend','status','afzendernaam','Ontvanger','verzenddatum','Onderwerp','tekst']]
+    #select relevant columns
+    dfxls=dfxls[['Inkomend','status','afzendernaam','Ontvanger','verzenddatum','Onderwerp','tekst']]
+    return(dfxls)
 
-#write textdump
-nptext=dfxls.as_matrix(['tekst'])
-tm=time.time()
-writetext(filename=textfilename,inputmatrix=nptext)
-print(time.time()-tm)
+def createtextdump(filename,dataframe):
+    #write textdump
+    nptext=dataframe.as_matrix(['tekst'])
+    tm=time.time()
+    writetext(filename=filename,inputmatrix=nptext)
+    print(time.time()-tm)
 
 
+if True==False:
+    mailtext=readfiles([textfilename])
+    mailtext=mailtext.replace('\n',' ')
+    mailtext=ReplaceTokens(mailtext)
+    mailwords=removewords(inputtext=mailtext,min_v=10,max_v=25000,stopword=stopword)
 
-
-
-mailtext=readfiles([textfilename])
-mailtext=mailtext.replace('\n',' ')
-mailtext=ReplaceTokens(mailtext)
-mailwords=removewords(inputtext=mailtext,min_v=10,max_v=25000,stopword=stopword)
-
-print(len(mailwords)) #aantal woorden
-print(len(list(set(mailwords)))) #aantal unieke woorden
+    print(len(mailwords)) #aantal woorden
+    print(len(list(set(mailwords)))) #aantal unieke woorden
