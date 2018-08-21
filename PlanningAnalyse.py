@@ -14,6 +14,7 @@ import re
 from collections import Counter
 stopword = stopwords.words("dutch")
 
+test=True
 workingdir='C:\\Users\\Kraan\\OneDrive - KZA B.V\\Data-gilde\\KZAplanning\\'
 textfilename=workingdir+'mailtekst.txt'
 sourcefile=workingdir+'Mailgegevens.xlsx'
