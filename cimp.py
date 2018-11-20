@@ -3,8 +3,6 @@ This function gives 3 variables: the dataframe, the raw text and the clean text.
 @author: Kraan
 """
 
-import pandas as pd
-import numpy as np
 from gensim.utils import tokenize
 from nltk.corpus import stopwords
 import time
@@ -12,20 +10,16 @@ import re
 from os import remove
 from collections import Counter
 stopword = stopwords.words("dutch")
+import os
+from mimp import readdata
 
-Maildata='Mailgegevens.xlsx'
-textfilename='mailtekst.txt'
+mypath = os.path.realpath(__file__)
+mypath = mypath[:mypath.find('cimp.py')]
+
+Maildata=mypath+'Mailgegevens.xlsx'
+textfilename=mypath+'mailtekst.txt'
 
 #DEFINE FUNCTIONS
-def definenumber(textpart):
-    """Based on "checklist" this function gives every item (in "textpart") a number coresponding with the position in the list.
-    Input: a string
-    Output: a number"""
-    checklist=['Sent Items','Inhuurprotocollen','Niet aangeboden','Intakes','Contracten','Aangeboden']
-    for i in range(len(checklist)):
-        if checklist[i] in textpart:
-            return i+1
-    return 0
 
 def readfiles(files):
     """function to get text out of a list of files.
@@ -79,24 +73,16 @@ def writetext(filename,inputmatrix):
             f.write(temp+'\n')
     f.close()
 
-def readdata(sourcefile):
-    #read data
-    dfxls=pd.read_excel(sourcefile,encoding='utf-8',errors='ignore')
-
-    #create indicator for in or outgoing mail
-    dfxls['Inkomend']=(dfxls['afzendernaam']!='KZA Planning') #als de afzender "KZA planning" is komt hier dus "FALSE"
-    dfxls['status']=(definenumber(dfxls['Map']))
-
-    #select relevant columns
-    dfxls=dfxls[['Inkomend','status','afzendernaam','Ontvanger','verzenddatum','Onderwerp','tekst']]
-    return(dfxls)
-
 def createtextdump(filename,dataframe):
     #write textdump
     nptext=dataframe.as_matrix(['tekst'])
     tm=time.time()
     writetext(filename=filename,inputmatrix=nptext)
     print(time.time()-tm)
+
+def getmaildata(sourcefile=Maildata):
+    dfxls=readdata(sourcefile=sourcefile)
+    return dfxls
 
 def getcleantext(sourcefile=Maildata,filename=textfilename,min_v=10,max_v=25000):
     dfxls=readdata(sourcefile=sourcefile)
@@ -107,3 +93,16 @@ def getcleantext(sourcefile=Maildata,filename=textfilename,min_v=10,max_v=25000)
     mailtext=ReplaceTokens(mailtext)
     mailwords=removewords(inputtext=mailtext,min_v=min_v,max_v=max_v,stopword=stopword)
     return(dfxls,mailtext,mailwords)
+
+def defineldaname(name):
+    """Function the rename all the model variables. Assumption is that all modelfiles are placed in one location
+    Input: Name of the files
+    Output: List of variables"""
+    modelpath = mypath+'\\Model\\' + name
+    LDAfile = modelpath+'.model'
+    corpus_name = modelpath+'.mm'
+    dictionaryfile = modelpath+'.dict'
+    htmlfile = modelpath+'.html'
+    tekstfile = modelpath+'.txt'
+    wordsfile = modelpath+'.csv'
+    return[modelpath,LDAfile,corpus_name,dictionaryfile,htmlfile,tekstfile,wordsfile]
