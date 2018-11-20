@@ -1,21 +1,14 @@
+# -*- coding: utf-8 -*-
 """This file contains functions to import and clean the data. The functions can be called independently or you can use the function "getcleantext" to get the whole process.
 This function gives 3 variables: the dataframe, the raw text and the clean text.
 @author: Kraan
 """
 
 import pandas as pd
-import numpy as np
-from gensim.utils import tokenize
-from nltk.corpus import stopwords
-import time
-import re
-from os import remove
-from collections import Counter
-stopword = stopwords.words("dutch")
 import os
 
 mypath = os.path.realpath(__file__)
-mypath = mypath[:mypath.find('cimp.py')]
+mypath = mypath[:mypath.find('mimp.py')]
 
 Maildata=mypath+'Mailgegevens.xlsx'
 textfilename=mypath+'mailtekst.txt'
@@ -31,7 +24,7 @@ def definenumber(textpart):
             return i+1
     return 0
 
-def readdata(sourcefile):
+def readdata(sourcefile=Maildata):
     #read data
     dfxls=pd.read_excel(sourcefile,encoding='utf-8',errors='ignore')
 
@@ -42,7 +35,7 @@ def readdata(sourcefile):
     dfxls['status']=status
 
     #select relevant columns
-    dfxls=dfxls[['Inkomend','status','afzendernaam','Ontvanger','verzenddatum','Onderwerp','tekst','conversationID']]
+    dfxls=dfxls[['Inkomend','status','afzendernaam','Ontvanger','Verzenddatum','Onderwerp','tekst','conversationID']]
 
     #little bit of cleaning
     dfxls['tekst'] = dfxls['tekst'].replace({'\n':' '}, regex=True).replace({'\r':' '}, regex=True).replace({'#':' '}, regex=True)
