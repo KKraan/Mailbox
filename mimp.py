@@ -27,6 +27,8 @@ def readdata(sourcefile=Maildata):
     # read data
     dfxls = pd.read_excel(sourcefile, encoding='utf-8', errors='ignore')
 
+    # Use only mail from the KZA mailbox
+    dfxls = dfxls[dfxls['Persoon'] == 'KZAPlanning@kza.nl']
     # create indicator for in or outgoing mail
     dfxls['Inkomend'] = (dfxls['afzendernaam'] != 'KZA Planning')  # als de afzender "KZA planning" is komt hier dus "FALSE"
     # dfxls['status']=(definenumber(dfxls['Map']))
