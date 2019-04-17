@@ -42,11 +42,13 @@ pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
 for text in tekst:
     if(text != None):
         text = str(text).lower()                                            #Alle tekst in kleine letters
-        text = pattern.sub('', text)
         text = text.translate(str.maketrans('', '', string.punctuation))    #Vervang meeste leestekens
         text = text.replace('•','').replace('’','')                         #Vervang rest van leestekens
         text = re.sub('\d+','',text)                                        #Vervang alle getallen
         text = text.split('Disclaimer', 1)[0]                               #Vervang alles na het woord disclaimer
+        text = re.sub(r'\w*http\w*', '', text)                              #Vervang alle woorden die http bevatten
+        text = re.sub(r'\w*brainnet\w*', '', text)                          #Vervang alle woorden die brainnet bevatten
+        text = pattern.sub('', text)                                        #Vervang alles uit de stopwoorden lijst
         allwords.extend(word_tokenize(text.lower()))
 wordcount = Counter(allwords)
 
@@ -59,12 +61,22 @@ dfwordcount.to_csv("results.csv",index=False, header=False)
 
 dfxls.to_csv("text.csv",index=False, header=True)
 
+#Woordkleur wordcloud in KZA kleuren
+def random_color_func(word=None, font_size=None, position=None, orientation=None, font_path=None, random_state=None):
+    h = int(float(random_state.randint(240, 320)))
+    s = int(100.0 )
+    l = int(50.0)
+
+    return "hsl({}, {}%, {}%)".format(h, s, l)
+
+
 #genereer een wordcloud
 def generate_wordcloud(text):
-    wc = WordCloud(background_color="white", max_words=50)
+    wc = WordCloud(background_color="white", max_words=30)
     # generate word cloud
     wc.generate_from_frequencies(text)
-    plt.imshow(wc, interpolation="bilinear")
+    plt.imshow(wc.recolor(color_func=random_color_func, random_state=3), interpolation="bilinear")
+
     plt.axis("off")
     plt.show()
 

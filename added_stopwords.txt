@@ -32,9 +32,9 @@ functie
 kzaplanningkzanl
 message
 startdatum
+einddatum
 aanbieding
 indien
-rabobank
 groetjes
 ontvangen
 zoek
@@ -54,4 +54,7 @@ via
 kzaplanningnl
 jaar
 uur
-email
+andor
+enof
+vacature
+alle
