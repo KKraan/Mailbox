@@ -12,8 +12,16 @@ import string
 import pandas as pd
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+from gensim.models import KeyedVectors
+from sklearn.cluster import KMeans
+import numpy as np
 
+nr_clusters = 50
+resultfile = 'result.csv'
 
+print('start model')
+w2v_model = KeyedVectors.load('word2vec_mail.model')
+print(w2v_model.most_similar('agile'))
 dfxls = readdata(sourcefile='Mailgegevens.xlsx')
 
 #dataframe met alleen de verzonden mails
@@ -37,6 +45,8 @@ stopwords = sw.words('dutch')
 stopwords.extend(sw.words('english'))
 stopwords.extend(addition[:len(addition)-1])
 
+print('clean text')
+
 allwords = []
 pattern = re.compile(r'\b(' + r'|'.join(stopwords) + r')\b\s*')
 for text in tekst:
@@ -52,6 +62,35 @@ for text in tekst:
         allwords.extend(word_tokenize(text.lower()))
 wordcount = Counter(allwords)
 
+print('create matrix')
+inputlist = wordcount.most_common()
+first = True
+for key, value in inputlist:
+    if first is True:
+        x = np.array([w2v_model[key]])
+        first = False
+    else:
+        if key in w2v_model.vocab:
+            x = np.append(x, [w2v_model[key]], axis=0)
+        else:
+            x = np.append(x, [np.zeros(200)], axis=0)
+
+print('create clustering')
+kmeans = KMeans(n_clusters=nr_clusters)
+kmeans.fit(x)
+
+newinfo = []
+for i in range(len(x)):
+    newinfo.append([inputlist[i][0], inputlist[i][1], kmeans.labels_[i]])
+
+print(wordcount.most_common(50))
+
+print('save results')
+with open(resultfile, "w", newline='',errors='ignore') as file:
+    writer = csv.writer(file)
+    writer.writerows(newinfo)
+
+print('continue')
 dfwordcount = pd.DataFrame(wordcount.most_common(),columns=['Word','Aantal'])
 dfwordcount["Aantal"] = pd.to_numeric(dfwordcount["Aantal"])
 #dfwordcount = dfwordcount[(dfwordcount.Aantal < (dfxls.count() * 0.9)) & (dfwordcount.Aantal > (dfxls.count() * 0.1))]

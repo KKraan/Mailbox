@@ -24,7 +24,6 @@ def read_input(input_file):
 
 documents = list(read_input(tekst))
 
-model = Word2Vec(documents, size=150, window=10, min_count=2, workers=10)
-model.train(documents, total_examples=len(documents), epochs=10)
+model = Word2Vec(documents, size=200, window=10, min_count=5, workers=10)
 
 model.wv.save('word2vec_mail.model')

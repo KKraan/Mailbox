@@ -42,6 +42,6 @@ class Lemma(object):
 
 if __name__ == "__main__":
     lemma = Lemma()
-    word = 'wetten'
+    word = 'gelopen'
     print(lemma.get_lemmas(word))
     print(lemma.get_all_forms(word))
