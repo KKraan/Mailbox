@@ -11,9 +11,11 @@ import matplotlib.pyplot as plt
 from gensim.models import KeyedVectors
 from sklearn.cluster import KMeans
 import numpy as np
+import pickle
 
 nr_clusters = 50
 clusterfile = './result/result.csv'
+sentsfile = './result/sents.pickle'
 cloudfig = './img/wc.png'
 model = './model/word2vec_mail.model'
 srcxlsx = './src/Mailgegevens.xlsx'
@@ -61,10 +63,12 @@ def cleantext(text):
 
 def process_text(tekst):
     allwords = []
+    allsents = []
     for text in tekst:
         if (text != None):
+            allsents.append(cleantext(text))
             allwords.extend(word_tokenize(cleantext(text)))
-    return Counter(allwords)
+    return Counter(allwords),allsents
 
 
 def create_vecgram(input,model,size):
@@ -119,8 +123,8 @@ def generate_wordcloud(text,figure):
     plt.imshow(wc.recolor(color_func=random_color_func, random_state=3), interpolation="bilinear")
 
     plt.axis("off")
-    plt.show()
     plt.savefig(figure, format="png")
+    plt.show()
 
 
 print('start model')
@@ -130,7 +134,9 @@ print('load data')
 tekst = get_data(source=srcxlsx)
 stoppattern = input_stopwords(xtra_stopwords)
 print('clean text')
-wordcount = process_text(tekst)
+wordcount,sents = process_text(tekst)
+with open(sentsfile, 'wb') as f:
+    pickle.dump(sents, f)
 print('create matrix')
 inputlist = wordcount.most_common()
 vecgram = create_vecgram(inputlist,w2v_model,vec_size)
